@@ -2,7 +2,6 @@ package com.github.ktomek.okcache.interceptor
 
 import com.github.ktomek.okcache.Cached
 import com.github.ktomek.okcache.FetchStrategy
-import com.github.ktomek.okcache.FetchStrategy.*
 import com.github.ktomek.okcache.HEADER_FETCH_STRATEGY
 import com.github.ktomek.okcache.NetworkInfoProvider
 import com.github.ktomek.okcache.interceptor.cache.AnnotationCache
@@ -24,7 +23,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import org.junit.jupiter.params.provider.ValueSource
 import retrofit2.Invocation
 import java.lang.reflect.Method
 
@@ -65,7 +63,6 @@ internal class InternalRequestCacheControlInterceptorTest {
         every { networkInfoProvider.isNetworkAvailable() } returns true
         every { fetchStrategyProcessorMapper.invoke((any())) } returns fetchStrategyProcessor
     }
-
 
     @Test
     fun `GIVEN request without Cached annotation WHEN intercept THEN proceed with original request`() {

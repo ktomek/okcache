@@ -71,7 +71,7 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
 
 detekt {
     toolVersion = "1.23.8"
-    config.setFrom(file("config/detekt-config.yml"))
+    config.setFrom(file("../config/detekt-config.yml"))
     buildUponDefaultConfig = true
     autoCorrect = true
 }
