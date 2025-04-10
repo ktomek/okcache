@@ -47,7 +47,7 @@ tasks.jacocoTestReport {
 
     reports {
         xml.required.set(true)
-        html.required.set(true)
+        html.required.set(false)
         csv.required.set(false)
     }
 
@@ -71,7 +71,7 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
 
 detekt {
     toolVersion = "1.23.8"
-    config.setFrom(file("config/detekt-config.yml"))
+    config.setFrom(file("../config/detekt-config.yml"))
     buildUponDefaultConfig = true
     autoCorrect = true
 }
