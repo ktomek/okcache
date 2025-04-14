@@ -51,8 +51,12 @@ jobs:
         distribution: 'temurin'
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Run Tests
+      run: ./gradlew test --no-daemon
     - name: Generate Test Coverage Report
       run: ./gradlew jacocoTestReport --no-daemon
+    - name: Check report dir
+      run: ls -l ./lib/build/reports/jacoco/test/
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
       with:
