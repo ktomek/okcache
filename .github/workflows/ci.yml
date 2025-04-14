@@ -1,6 +1,14 @@
-name: Build, Test, Coverage, and Lint
+name: Build, Test, Coverage
 
-on: [push, pull_request]
+push:
+  branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
