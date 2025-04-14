@@ -1,9 +1,6 @@
 name: Build, Test, Coverage
 
-push:
-  branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push]
 
 permissions:
   id-token: write
