@@ -4,8 +4,8 @@ import org.gradle.kotlin.dsl.withType
 
 plugins {
     kotlin("jvm") version "2.1.20"
-    id("jacoco")
-    id("io.gitlab.arturbosch.detekt") version("1.23.8")
+    jacoco
+    id("io.gitlab.arturbosch.detekt") version ("1.23.8")
 }
 
 group = "com.github.ktomek.okcache"
@@ -33,32 +33,15 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport) // auto-run after test
 }
 kotlin {
     jvmToolchain(21)
 }
 
 jacoco {
-    toolVersion = "0.8.10" // You can check for latest version
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test) // tests are required to run before generating the report
-
-    reports {
-        xml.required.set(true)
-        html.required.set(false)
-        csv.required.set(false)
-    }
-
-    // Optional: Include only your code packages
-    classDirectories.setFrom(
-        fileTree("${layout.buildDirectory}/classes/kotlin/main") {
-            exclude("**/generated/**")
-        }
-    )
-    sourceDirectories.setFrom(files("src/main/kotlin"))
-    executionData.setFrom(files("${layout.buildDirectory}/jacoco/test.exec"))
+    toolVersion = "0.8.13" // You can check for latest version
+    reportsDirectory = layout.buildDirectory.dir("reports/jacoco")
 }
 
 // Kotlin DSL
@@ -74,4 +57,12 @@ detekt {
     config.setFrom(file("../config/detekt-config.yml"))
     buildUponDefaultConfig = true
     autoCorrect = true
+}
+
+tasks.jacocoTestReport {
+    reports {
+        html.required = false
+        xml.required = true
+        csv.required = false
+    }
 }
