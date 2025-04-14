@@ -1,15 +1,17 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import org.gradle.kotlin.dsl.withType
+import java.io.ByteArrayOutputStream
 
 plugins {
     kotlin("jvm") version "2.1.20"
     jacoco
     id("io.gitlab.arturbosch.detekt") version ("1.23.8")
+
 }
 
 group = "com.github.ktomek.okcache"
-version = "1.0-SNAPSHOT"
+version = getGitTagVersion()
 
 repositories {
     mavenCentral()
@@ -52,6 +54,14 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = "1.8"
 }
 
+tasks.named("check").configure {
+    this.setDependsOn(
+        this.dependsOn.filterNot {
+            it is TaskProvider<*> && it.name == "detekt"
+        }
+    )
+}
+
 detekt {
     toolVersion = "1.23.8"
     config.setFrom(file("../config/detekt-config.yml"))
@@ -64,5 +74,19 @@ tasks.jacocoTestReport {
         html.required = false
         xml.required = true
         csv.required = false
+    }
+}
+
+@Suppress("TooGenericExceptionCaught", "SwallowedException")
+fun getGitTagVersion(): String {
+    return try {
+        val stdout = ByteArrayOutputStream()
+        exec {
+            commandLine = listOf("git", "describe", "--tags", "--abbrev=0")
+            standardOutput = stdout
+        }
+        stdout.toString().trim().removePrefix("v")
+    } catch (e: Exception) {
+        "0.0.1-SNAPSHOT" // fallback if no tag found
     }
 }

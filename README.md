@@ -1,3 +1,11 @@
+![Build](https://github.com/ktomek/okcache/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/ktomek/okcache/branch/main/graph/badge.svg)](https://codecov.io/gh/ktomek/okcache)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![GitHub release](https://img.shields.io/github/v/release/ktomek/okcache)
+![GitHub issues](https://img.shields.io/github/issues/ktomek/okcache)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/ktomek/okcache)
+[![JitPack](https://jitpack.io/v/ktomek/okcache.svg)](https://jitpack.io/#ktomek/okcache)
+
 # OkCache
 
 OkCache is an open-source caching library for Android and JVM applications that leverages OkHttp to provide advanced HTTP caching strategies. It simplifies HTTP caching in your Retrofit APIs by allowing you to enable caching via annotations and choose from several fetch strategies, such as always fetching from the network, caching only, and various fallback approaches.
@@ -59,7 +67,7 @@ interface MyApiService {
 Set up your OkHttpClient with the request and network interceptors:
 
 ```kotlin
-val networkInfoProvider: NetworkInfoProvider = // your implementation
+val networkInfoProvider: NetworkInfoProvider = YourNetworkInfoProvider()
 val cacheDir = File(context.cacheDir, "http_cache")
 val cacheSize = 10L * 1024 * 1024  // 10 MB
 
