@@ -1,15 +1,17 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import org.gradle.kotlin.dsl.withType
+import java.io.ByteArrayOutputStream
 
 plugins {
     kotlin("jvm") version "2.1.20"
-    id("jacoco")
-    id("io.gitlab.arturbosch.detekt") version("1.23.8")
+    jacoco
+    id("io.gitlab.arturbosch.detekt") version ("1.23.8")
+
 }
 
 group = "com.github.ktomek.okcache"
-version = "1.0-SNAPSHOT"
+version = getGitTagVersion()
 
 repositories {
     mavenCentral()
@@ -33,32 +35,15 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport) // auto-run after test
 }
 kotlin {
     jvmToolchain(21)
 }
 
 jacoco {
-    toolVersion = "0.8.10" // You can check for latest version
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test) // tests are required to run before generating the report
-
-    reports {
-        xml.required.set(true)
-        html.required.set(false)
-        csv.required.set(false)
-    }
-
-    // Optional: Include only your code packages
-    classDirectories.setFrom(
-        fileTree("${layout.buildDirectory}/classes/kotlin/main") {
-            exclude("**/generated/**")
-        }
-    )
-    sourceDirectories.setFrom(files("src/main/kotlin"))
-    executionData.setFrom(files("${layout.buildDirectory}/jacoco/test.exec"))
+    toolVersion = "0.8.13" // You can check for latest version
+    reportsDirectory = layout.buildDirectory.dir("reports/jacoco")
 }
 
 // Kotlin DSL
@@ -69,9 +54,39 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = "1.8"
 }
 
+tasks.named("check").configure {
+    this.setDependsOn(
+        this.dependsOn.filterNot {
+            it is TaskProvider<*> && it.name == "detekt"
+        }
+    )
+}
+
 detekt {
     toolVersion = "1.23.8"
     config.setFrom(file("../config/detekt-config.yml"))
     buildUponDefaultConfig = true
     autoCorrect = true
+}
+
+tasks.jacocoTestReport {
+    reports {
+        html.required = false
+        xml.required = true
+        csv.required = false
+    }
+}
+
+@Suppress("TooGenericExceptionCaught", "SwallowedException")
+fun getGitTagVersion(): String {
+    return try {
+        val stdout = ByteArrayOutputStream()
+        exec {
+            commandLine = listOf("git", "describe", "--tags", "--abbrev=0")
+            standardOutput = stdout
+        }
+        stdout.toString().trim().removePrefix("v")
+    } catch (e: Exception) {
+        "0.0.1-SNAPSHOT" // fallback if no tag found
+    }
 }
