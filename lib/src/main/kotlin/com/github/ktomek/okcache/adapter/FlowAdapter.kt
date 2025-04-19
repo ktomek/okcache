@@ -35,9 +35,7 @@ internal class FlowAdapter<T : Any>(
             @Suppress("TooGenericExceptionCaught")
             override fun onResponse(call: Call<T>, response: Response<T>) = try {
                 if (response.isSuccessful) {
-                    continuation.resume(response.body()!!) { cause, _, _ ->
-                        continuation.resumeWithException(cause)
-                    }
+                    continuation.resume(response.body()!!) { _, _, _ -> }
                 } else {
                     continuation.resumeWithException(HttpException(response))
                 }
