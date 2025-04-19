@@ -21,8 +21,10 @@ class FlowCallAdapterFactory : CallAdapter.Factory() {
     ): CallAdapter<*, *>? = returnType
         .let { it as? ParameterizedType }
         ?.takeIf { getRawType(it) == Flow::class.java }
-        ?.let { getParameterUpperBound(0, it) }
-        ?.let { FlowAdapter<Any>(it, cache) }
+        ?.let { FlowAdapter<Any>(getParamUpperBound(it), cache) }
+
+    private fun getParamUpperBound(type: ParameterizedType): Type =
+        getParameterUpperBound(0, type)
 
     companion object {
         @JvmStatic
