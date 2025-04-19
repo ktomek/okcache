@@ -7,7 +7,6 @@ plugins {
     kotlin("jvm") version "2.1.20"
     jacoco
     id("io.gitlab.arturbosch.detekt") version ("1.23.8")
-
 }
 
 group = "com.github.ktomek.okcache"
@@ -27,7 +26,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("io.mockk:mockk:1.13.10")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation("com.squareup.retrofit2:converter-scalars:2.9.0")
 
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
@@ -86,7 +85,7 @@ fun getGitTagVersion(): String {
             standardOutput = stdout
         }
         stdout.toString().trim().removePrefix("v")
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         "0.0.1-SNAPSHOT" // fallback if no tag found
     }
 }
