@@ -19,8 +19,8 @@ class FlowCallAdapterFactory : CallAdapter.Factory() {
         annotations: Array<out Annotation?>,
         retrofit: Retrofit
     ): CallAdapter<*, *>? = returnType
-        .takeIf { getRawType(it) == Flow::class.java }
-        ?.let { it as? ParameterizedType }
+        .let { it as? ParameterizedType }
+        ?.takeIf { getRawType(it) == Flow::class.java }
         ?.let { getParameterUpperBound(0, it) }
         ?.let { FlowAdapter<Any>(it, cache) }
 

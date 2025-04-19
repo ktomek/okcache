@@ -11,6 +11,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Call
 import retrofit2.CallAdapter
 import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
 import java.lang.reflect.Type
 import kotlin.coroutines.resumeWithException
@@ -33,8 +34,12 @@ internal class FlowAdapter<T : Any>(
 
             @Suppress("TooGenericExceptionCaught")
             override fun onResponse(call: Call<T>, response: Response<T>) = try {
-                continuation.resume(response.body()!!) { cause, _, _ ->
-                    continuation.resumeWithException(cause)
+                if (response.isSuccessful) {
+                    continuation.resume(response.body()!!) { cause, _, _ ->
+                        continuation.resumeWithException(cause)
+                    }
+                } else {
+                    continuation.resumeWithException(HttpException(response))
                 }
             } catch (e: Exception) {
                 continuation.resumeWithException(e)
