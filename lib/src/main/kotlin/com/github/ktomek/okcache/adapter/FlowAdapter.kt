@@ -22,27 +22,27 @@ internal class FlowAdapter<T : Any>(
     override fun responseType(): Type = type
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun adapt(call: Call<T>): Flow<T> = flow {
-        val value = suspendCancellableCoroutine<T> { continuation ->
-            call.enqueue(object : Callback<T> {
+    override fun adapt(call: Call<T>): Flow<T> =
+        flow { emit(enqueue(call)) }
+            .onEach { flowsCache.emit<T>(call.request(), it) }
+            .flatMapLatest { flowsCache.getFlow<T>(call.request()).onStart { emit(it) } }
+            .distinctUntilChanged()
 
-                @Suppress("TooGenericExceptionCaught")
-                override fun onResponse(call: Call<T>, response: Response<T>) = try {
-                    continuation.resume(response.body()!!) { cause, _, _ ->
-                        continuation.resumeWithException(cause)
-                    }
-                } catch (e: Exception) {
-                    continuation.resumeWithException(e)
-                }
+    private suspend fun enqueue(call: Call<T>): T = suspendCancellableCoroutine<T> { continuation ->
+        call.enqueue(object : Callback<T> {
 
-                override fun onFailure(call: Call<T>, t: Throwable) {
-                    continuation.resumeWithException(t)
+            @Suppress("TooGenericExceptionCaught")
+            override fun onResponse(call: Call<T>, response: Response<T>) = try {
+                continuation.resume(response.body()!!) { cause, _, _ ->
+                    continuation.resumeWithException(cause)
                 }
-            })
-        }
-        emit(value)
+            } catch (e: Exception) {
+                continuation.resumeWithException(e)
+            }
+
+            override fun onFailure(call: Call<T>, t: Throwable) {
+                continuation.resumeWithException(t)
+            }
+        })
     }
-        .onEach { flowsCache.emit<T>(call.request(), it) } // flowsCache.emit<T>(call.request(), it) }
-        .flatMapLatest { flowsCache.getFlow<T>(call.request()).onStart { emit(it) } }
-        .distinctUntilChanged()
 }

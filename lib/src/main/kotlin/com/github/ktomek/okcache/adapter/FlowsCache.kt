@@ -36,11 +36,9 @@ internal class InMemoryFlowsCache : FlowsCache {
         return (cacheMap.getOrPut(key) { MutableSharedFlow() } as MutableSharedFlow<T>)
     }
 
-    override suspend fun <T : Any> emit(request: Request, value: T) {
-        val key = requestKey(request)
-        val flow = cacheMap.getOrPut(key) { MutableSharedFlow<Any>() }
-        flow.emit(value)
-    }
+    override suspend fun <T : Any> emit(request: Request, value: T) = requestKey(request)
+        .let { cacheMap.getOrPut(it) { MutableSharedFlow<Any>() } }
+        .emit(value)
 
     private fun requestKey(request: Request): String {
         val url = request.url.toString()

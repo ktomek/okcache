@@ -18,11 +18,11 @@ class FlowCallAdapterFactory : CallAdapter.Factory() {
         returnType: Type,
         annotations: Array<out Annotation?>,
         retrofit: Retrofit
-    ): CallAdapter<*, *>? {
-        if (returnType !is ParameterizedType || getRawType(returnType) != Flow::class.java) return null
-        val flowType = getParameterUpperBound(0, returnType)
-        return FlowAdapter<Any>(flowType, cache)
-    }
+    ): CallAdapter<*, *>? = returnType
+        .takeIf { getRawType(it) == Flow::class.java }
+        ?.let { it as? ParameterizedType }
+        ?.let { getParameterUpperBound(0, it) }
+        ?.let { FlowAdapter<Any>(it, cache) }
 
     companion object {
         @JvmStatic
