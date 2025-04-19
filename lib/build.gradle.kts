@@ -7,7 +7,6 @@ plugins {
     kotlin("jvm") version "2.1.20"
     jacoco
     id("io.gitlab.arturbosch.detekt") version ("1.23.8")
-
 }
 
 group = "com.github.ktomek.okcache"
